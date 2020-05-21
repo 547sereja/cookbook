@@ -1,33 +1,31 @@
-cook_book = {}
-def get_cooking_book():
-    with open('recipes.txt') as file_to_read:
-        while True:
-            recipe_name = file_to_read.readline().strip()
-            if recipe_name.strip() == '':
-                break
-            number_of_ingredients = int(file_to_read.readline().strip())
-            list_of_ingredients = []
-            for i in range(number_of_ingredients):
-                ingredient = file_to_read.readline().strip().split(' | ')
-                ingredients = {'ingredient_name': ingredient[0], 'quantity': int(ingredient[1]), 'measure': ingredient[2]}
-                list_of_ingredients.append(ingredients)
-                cook_book.update({recipe_name: list_of_ingredients})
-    print(cook_book)
-get_cooking_book()
 
-def get_shop_list_by_dishes(dishes, person_count):
-    shop_list = {}
-    for dish in dishes:
-        for ingredient in cook_book[dish]:
-            new_shop_list_item = dict(ingredient)
-            new_shop_list_item['quantity'] *= person_count
-            if new_shop_list_item['ingredient_name'] not in shop_list:
-                shop_list[new_shop_list_item['ingredient_name']] = new_shop_list_item
-            else:
-                shop_list[new_shop_list_item['ingredient_name']]['quantity'] += new_shop_list_item['quantity']
-    print(shop_list)
-get_shop_list_by_dishes(['Омлет'], 2)
+def create_book(book_name):
+    with open('recipes.txt', encoding='UTF-8') as fi:
+        cook_dict = {}
+        for line in fi:
+            dish_name = line.strip()
+            cook_dict[dish_name] = []
+            counter = int(fi.readline().strip())
+            for i in range(counter):
+                ingredients = fi.readline().strip().split('|')
+                temp_dict = {'ingredient_name': ingredients[0], 'quantity': ingredients[1], 'measure': ingredients[2]}
+                cook_dict[dish_name].append(temp_dict)
+            fi.readline()
+        return cook_dict
 
+
+def get_shop_list_by_dishes(dishes, persons):
+    cook_dict = create_book('recipes.txt')
+    shoplist = {}
+    for dish_name in dishes:
+        if dish_name in cook_dict:
+            for ingredients in cook_dict[dish_name]:
+                if ingredients['ingredient_name'] in shoplist:
+                    shoplist[ingredients['ingredient_name']]['quantity'] += int((ingredients['quantity']) * persons)
+                else:
+                    shoplist[ingredients['ingredient_name']] = {'measure': ingredients['measure'],
+                                                                'quantity': int(ingredients['quantity']) * persons}
+    return shoplist
 
 
 
